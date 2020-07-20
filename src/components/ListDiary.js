@@ -7,7 +7,7 @@ export default function ListDiary (props) {
 
     return(
         <View style={styles.container} >
-            <Text style={styles.date}>{moment(props.date).format('MMMM dddd YYYY')}</Text>
+            <Text style={styles.date}>{moment(props.date).format('dddd MMMM DD YYYY')}</Text>
             <Text style={styles.description}>{props.description}</Text>
             <View style={{flexDirection:'row', justifyContent:'flex-end', alignItems:'center'}}>
             <Text style={{marginRight:10, fontSize:25, fontWeight:'bold', color:'#C04848'}}>{props.like}</Text>

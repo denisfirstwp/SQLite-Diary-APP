@@ -16,6 +16,7 @@ let db
 const initialState = {
     inputValue:'',
     list:[],
+    sorted: false
 }
 
 export default class Main extends Component {
@@ -54,7 +55,6 @@ export default class Main extends Component {
 
        await db.transaction((tx)=>{
             tx.executeSql("INSERT INTO tbl_diarys (date, 'description', 'likes') VALUES (?,?,?)", [`${new Date()}`, this.state.inputValue, 0], (tx,results =>{
-                Alert.alert('', 'New Diary created with success !')
             }),(error)=> {console.log(error)})
         })        
 
@@ -66,9 +66,9 @@ export default class Main extends Component {
 
     actionSortDiary = () => {
 
-        Alert.alert('Sorting diarys')
-        
+         this.setState({sorted: !this.state.sorted}, this.loadList)
 
+        
     }
 
     actionDeleteAllDiary = async () => {
@@ -112,6 +112,10 @@ export default class Main extends Component {
 
     loadList = () => {
         
+       // Alert.alert(`${this.state.sorted}`)
+
+        if(this.state.sorted === false) {
+            //Alert.alert('entro aqui')
         db.transaction((tx)=>{
             tx.executeSql("SELECT * FROM tbl_diarys",[], (tx,results) =>{
                 
@@ -125,6 +129,22 @@ export default class Main extends Component {
                   this.setState({list: [...vector]})
             }),(error)=> {console.log(error)}
         })
+    }else if (this.state.sorted===true){
+        db.transaction((tx)=>{
+            tx.executeSql("SELECT * FROM tbl_diarys ORDER BY id DESC",[], (tx,results) =>{
+                
+              var len = results.rows.length;
+              var vector = []
+
+              for (let i = 0; i < len; i++) {
+                  let row = results.rows.item(i);
+                  vector.push(row)
+                  }
+                  this.setState({list: [...vector]})
+            }),(error)=> {console.log(error)}
+        })
+
+    }
 
     }
   
