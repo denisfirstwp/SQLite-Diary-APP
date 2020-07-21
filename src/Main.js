@@ -16,7 +16,7 @@ let db
 const initialState = {
     inputValue:'',
     list:[],
-    sorted: false
+    sorted: true
 }
 
 export default class Main extends Component {
@@ -71,7 +71,40 @@ export default class Main extends Component {
         
     }
 
+    askForDeleteDiary = (id) => {
+        
+        Alert.alert('Warning !', 'You are about to delete you diary record ! Are you sure you want to do this ?', 
+        [{
+            text:"No i don't want to delete !",
+            onPress: ()=> this.loadList(),
+            style: 'cancel'
+        },
+        {
+            text:"Yes i want to delete !",
+            onPress:()=> this.deletingDiary(id),
+            style:'default'
+        }
+        ])
+     }
+
+
+
+
+    deletingDiary = async (id) => {
+        db.transaction(async (tx)=>{
+            
+         await tx.executeSql("DELETE FROM tbl_diarys WHERE id=? ", [id], (tx,results =>{
+                console.log(results)
+            }),(error)=> {console.log(error)})
+        })       
+
+        
+        this.loadList();     
+
+        }
+
     actionDeleteAllDiary = async () => {
+
 
         Alert.alert(
             'Warning !',
@@ -112,7 +145,7 @@ export default class Main extends Component {
 
     loadList = () => {
         
-       // Alert.alert(`${this.state.sorted}`)
+      
 
         if(this.state.sorted === false) {
             //Alert.alert('entro aqui')
@@ -140,7 +173,7 @@ export default class Main extends Component {
                   let row = results.rows.item(i);
                   vector.push(row)
                   }
-                  this.setState({list: [...vector]})
+                  this.setState({list: vector})
             }),(error)=> {console.log(error)}
         })
 
@@ -165,8 +198,8 @@ export default class Main extends Component {
                 <FlatList 
                 style={{height:0}}
                 data={this.state.list}
-                keyExtractor={(value,index)=> `${index}` }
-                renderItem={({item})=> <ListDiary {...item} />} 
+                keyExtractor={(item)=> `${item.id}` }
+                renderItem={({item})=>  <ListDiary exclude={this.deletingDiary} {...item} />} 
                 />
                 
 
