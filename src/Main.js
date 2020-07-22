@@ -1,11 +1,12 @@
 import React, { Component, Fragment } from 'react'
-import {View, StyleSheet, Text, Alert, SafeAreaView, FlatList} from 'react-native'
+import {View, StyleSheet, Text, Alert, SafeAreaView, FlatList, LogBox} from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import SQLite from 'react-native-sqlite-storage'
 
 import TextBox from './components/TextBox'
 import ListDiary from './components/ListDiary'
 import ActionButton from './components/ActionButton'
+import sqlExecute from './my_exports/sqlExecute'
 
 import vectors from './vectors'
 
@@ -29,7 +30,9 @@ export default class Main extends Component {
         super(props)
 
         db = SQLite.openDatabase({name:'diarys_db', createFromLocation:2}, this.successConection, this.badConnection);
-        
+        //console.disableYellowBox= true;
+        LogBox.ignoreAllLogs();
+        console.warn= () =>{};
     }
 
     successConection = () => {
@@ -143,6 +146,35 @@ export default class Main extends Component {
 
     }
 
+    addLike = async (id) => {
+        let likes
+        //Using my promise
+
+       await sqlExecute(db,'SELECT * FROM tbl_diarys WHERE id=?',[id]).then((item)=>{
+            
+          likes= item[0].likes
+
+
+        }).catch((error)=>{
+            Alert.alert('Some error had happened');
+            console.log(error)
+        })
+
+        likes = likes + 1 // adding more one number to likes
+
+        await sqlExecute(db, 'UPDATE tbl_diarys SET likes = ? WHERE id= ? ',[likes,id]).then((item)=>{
+            console.log('Sucess ')
+        }).catch((error)=>{
+            Alert.alert('Some error had happened')
+            console.log(error)
+        })
+
+
+
+        this.loadList();
+
+    }
+
     loadList = () => {
         
       
@@ -199,7 +231,7 @@ export default class Main extends Component {
                 style={{height:0}}
                 data={this.state.list}
                 keyExtractor={(item)=> `${item.id}` }
-                renderItem={({item})=>  <ListDiary exclude={this.deletingDiary} {...item} />} 
+                renderItem={({item})=>  <ListDiary onLike={this.addLike} exclude={this.deletingDiary} {...item} />} 
                 />
                 
 

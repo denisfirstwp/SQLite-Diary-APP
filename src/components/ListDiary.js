@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, Text, StyleSheet, TouchableOpacity, Alert} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity, Alert, ToolbarAndroid} from 'react-native'
 import moment from 'moment'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import LinearGradient from 'react-native-linear-gradient'
@@ -39,11 +39,15 @@ export default function ListDiary (props) {
         renderRightActions={renderzin}
         >
         <View style={styles.container} >
-            <Text style={styles.date}>{moment(props.date).format('dddd MMMM DD YYYY')}</Text>
+            <Text style={styles.date}>{`${moment(props.date).format('dddd MMMM DD YYYY')}`}</Text>
             <Text style={styles.description}>{props.description}</Text>
             <View style={{flexDirection:'row', justifyContent:'flex-end', alignItems:'center'}}>
-            <Text style={{marginRight:10, fontSize:25, fontWeight:'bold', color:'#C04848'}}>{props.like}</Text>
-            <Icon name='thumbs-up' color='#C04848' size={25} />
+            <Text style={{marginRight:10, fontSize:25, fontWeight:'bold', color:'#C04848'}}>{props.likes}</Text>
+            <TouchableOpacity onPress={()=> props.onLike(props.id)}>
+                <View style={{height:35,width:40, justifyContent:'center', alignItems:'center'}}>
+                      <Icon name='thumbs-up' color='#C04848' size={25} />
+                </View>
+            </TouchableOpacity>
             </View>
         </View>
         </Swipeable>
